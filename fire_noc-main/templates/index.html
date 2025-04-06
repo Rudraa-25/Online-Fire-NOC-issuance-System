@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Fire NOC Issuance System</title>
+    <link rel="shortcut icon" href="{% static 'logo.png' %} " type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="container"> 
+        <div class="header">
+            <img src="{% static 'logo.png' %}" alt="Fire NOC Logo">
+            <h1 class="title">Online Fire NOC Issuance System</h1>
+        </div>
+
+        <form id="nocForm" action="{% url "generate_noc" %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h2 class="sub-title">Personal Information</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" name="name" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" name="email" id="email" required>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" name="phone" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Application Date</label>
+                        <input type="date" name="date" id="date" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="sub-title">Organization Details</h2>
+                <div class="form-group">
+                    <label for="org_name">Organization Name</label>
+                    <input type="text" name="org_name" id="org_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="org_address">Organization Address</label>
+                    <input type="text" name="org_address" id="org_address" required>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="sub-title">Required Documents</h2>
+                <p>Please upload clear images of the following fire safety equipment:</p>
+
+                <div class="form-group">
+                    <label for="fire_extinguisher">Fire Extinguisher</label>
+                    <div class="upload-section" id="fire_extinguisher_section">
+                        <i class="fa-solid fa-fire-extinguisher"></i>
+                        <div class="upload-section-title">
+                            <h6>Click to upload or drag and drop</h6>
+                            <h6>JPG, JPEG, PNG (Max: 10MB)</h6>
+                        </div>
+                        <input type="file" name="fire_extinguisher" id="fire_extinguisher" accept=".jpg,.jpeg,.png" class="file-upload" required onchange="verifyImage(this, 'fire_extinguisher')">
+                        <div id="fire_extinguisher_progress" class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                    <div id="fire_extinguisher_result" class="verification-result"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fire_exit">Fire Exit</label>
+                    <div class="upload-section" id="fire_exit_section">
+                        <i class="fa-solid fa-door-open"></i>
+                        <div class="upload-section-title">
+                            <h6>Click to upload or drag and drop</h6>
+                            <h6>JPG, JPEG, PNG (Max: 10MB)</h6>
+                        </div>
+                        <input type="file" name="fire_exit" id="fire_exit" accept=".jpg,.jpeg,.png" class="file-upload" required onchange="verifyImage(this, 'fire_exit')">
+                        <div id="fire_exit_progress" class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                    <div id="fire_exit_result" class="verification-result"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fire_safety_sign">Fire Safety Warning Signs</label>
+                    <div class="upload-section" id="fire_safety_sign_section">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div class="upload-section-title">
+                            <h6>Click to upload or drag and drop</h6>
+                            <h6>JPG, JPEG, PNG (Max: 10MB)</h6>
+                        </div>
+                        <input type="file" name="fire_safety_sign" id="fire_safety_sign" accept=".jpg,.jpeg,.png" class="file-upload" required onchange="verifyImage(this, 'fire_safety_sign')">
+                        <div id="fire_safety_sign_progress" class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                    <div id="fire_safety_sign_result" class="verification-result"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="water_infrastructure">Water Infrastructure</label>
+                    <div class="upload-section" id="water_infrastructure_section">
+                        <i class="fa-solid fa-faucet"></i>
+                        <div class="upload-section-title">
+                            <h6>Click to upload or drag and drop</h6>
+                            <h6>JPG, JPEG, PNG (Max: 10MB)</h6>
+                        </div>
+                        <input type="file" name="water_infrastructure" id="water_infrastructure" accept=".jpg,.jpeg,.png" class="file-upload" required onchange="verifyImage(this, 'water_infrastructure')">
+                        <div id="water_infrastructure_progress" class="progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                    <div id="water_infrastructure_result" class="verification-result"></div>
+                </div>
+            </div>
+
+            <div class="center">
+                <button id="analyze" type="submit">Generate NOC <div class="loading-spinner" id="submit-spinner"></div></button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function verifyImage(inputElement, equipmentType) {
+            const file = inputElement.files[0];
+            if (!file) return;
+            
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                showVerificationResult(equipmentType, false, "File size exceeds 10MB limit");
+                inputElement.value = ''; // Clear the file input
+                return;
+            }
+            
+            // Show progress animation
+            const progressBar = document.querySelector(`#${equipmentType}_progress .progress-bar`);
+            progressBar.style.width = '0%';
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${Math.min(progress, 95)}%`;
+                if (progress >= 95) clearInterval(progressInterval);
+            }, 50);
+            
+            // Prepare form data for image verification API
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('equipment_type', equipmentType);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            
+            // Send request to verify the image
+            fetch('/verify_image/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                
+                if (data.valid) {
+                    // Image is valid for the equipment type
+                    if (data.duplicate_check.is_duplicate) {
+                        // Valid but duplicate
+                        showVerificationResult(equipmentType, 'warning', data.duplicate_check.message);
+                    } else {
+                        // Valid and not a duplicate
+                        showVerificationResult(equipmentType, true, `${data.message} (Confidence: ${data.confidence.toFixed(2)}%)`);
+                    }
+                } else {
+                    // Image is not valid
+                    showVerificationResult(equipmentType, false, data.message);
+                    inputElement.value = ''; // Clear the file input
+                }
+                
+                // Reset progress bar after a delay
+                setTimeout(() => {
+                    progressBar.style.width = '0%';
+                }, 1000);
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                console.error('Error:', error);
+                showVerificationResult(equipmentType, false, "Error verifying image. Please try again.");
+                progressBar.style.width = '0%';
+            });
+        }
+        
+        function showVerificationResult(equipmentType, status, message) {
+            const resultElement = document.getElementById(`${equipmentType}_result`);
+            
+            // Remove all status classes
+            resultElement.classList.remove('verification-success', 'verification-error', 'verification-warning');
+            
+            // Set content and show
+            resultElement.textContent = message;
+            
+            if (status === true) {
+                resultElement.classList.add('verification-success');
+            } else if (status === false) {
+                resultElement.classList.add('verification-error');
+            } else if (status === 'warning') {
+                resultElement.classList.add('verification-warning');
+            }
+            
+            resultElement.style.display = 'block';
+        }
+        
+        // Form submission with loading indicator
+        document.getElementById('nocForm').addEventListener('submit', function(e) {
+            // Show loading spinner
+            document.getElementById('submit-spinner').style.display = 'inline-block';
+            
+            // Disable submit button
+            document.getElementById('analyze').disabled = true;
+        });
+        
+        // Add drag and drop functionality for each upload section
+        document.querySelectorAll('.upload-section').forEach(section => {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                section.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            // Highlight drop area on drag enter/over
+            ['dragenter', 'dragover'].forEach(eventName => {
+                section.addEventListener(eventName, function() {
+                    this.style.borderColor = 'var(--primary-color)';
+                    this.style.backgroundColor = '#f0f4f8';
+                }, false);
+            });
+            
+            // Remove highlight on drag leave/drop
+            ['dragleave', 'drop'].forEach(eventName => {
+                section.addEventListener(eventName, function() {
+                    this.style.borderColor = '#cbd5e0';
+                    this.style.backgroundColor = '#f5f7fa';
+                }, false);
+            });
+            
+            // Handle file drop
+            section.addEventListener('drop', function(e) {
+                const fileInput = this.querySelector('input[type="file"]');
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    // Trigger change event to run verification
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            }, false);
+        });
+    </script>
+</body>
+</html>
